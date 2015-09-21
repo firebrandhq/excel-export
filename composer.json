@@ -13,5 +13,9 @@
             "email": "hello@firebrand.nz"
         }
     ],
-    "minimum-stability": "dev"
+    "suggest": {
+		"silverstripe/restfulserver": "If you install the restfull server, you'll be able to dynamically generate SpreadSheet on the fly."
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true
 }
