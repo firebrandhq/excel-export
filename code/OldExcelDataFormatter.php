@@ -1,8 +1,20 @@
 <?php
 
+/**
+ * OldExcelDataFormatter extends {@link ExcelDataFormatter} to provide a DataFormatter
+ * suitable for exporting an {@link SS_link} of {@link DataObjectInterface} to
+ * a Excel5 spreadsheet (XLS).
+ *
+ * @author Firebrand <hello@firebrand.nz>
+ * @license MIT
+ * @package silverstripe-excel-export
+ */
 class OldExcelDataFormatter extends ExcelDataFormatter
 {
 
+    /**
+     * @inheritdoc
+     */
     public function supportedExtensions()
     {
         return array(
@@ -10,6 +22,9 @@ class OldExcelDataFormatter extends ExcelDataFormatter
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function supportedMimeTypes()
     {
         return array(
@@ -17,7 +32,9 @@ class OldExcelDataFormatter extends ExcelDataFormatter
         );
     }
 
-
+    /**
+     * @inheritdoc
+     */
     public function convertDataObjectSet(SS_List $set)
     {
         $this->setHeader();
@@ -28,5 +45,4 @@ class OldExcelDataFormatter extends ExcelDataFormatter
 
         return $fileData;
     }
-
 }
