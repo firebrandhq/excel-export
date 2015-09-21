@@ -1,10 +1,26 @@
 <?php
 
+/**
+ * ExcelDataFormatter provides a DataFormatter allowing an {@link SS_link} of
+ * {@link DataObjectInterface} to be exported to be to Excel 2007 Spreadsheet
+ * (XLSX).
+ *
+ * This class can be extended to export to other format supported by
+ * {@link https://github.com/PHPOffice/PHPExcel PHPExcel}.
+ *
+ * @author Firebrand <hello@firebrand.nz>
+ * @license MIT
+ * @package silverstripe-excel-export
+ */
 class ExcelDataFormatter extends DataFormatter
 {
 
+
     private static $api_base = "api/v1/";
 
+    /**
+     * @inheritdoc
+     */
     public function supportedExtensions()
     {
         return array(
@@ -12,6 +28,9 @@ class ExcelDataFormatter extends DataFormatter
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function supportedMimeTypes()
     {
         return array(
@@ -19,11 +38,17 @@ class ExcelDataFormatter extends DataFormatter
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function convertDataObject(DataObjectInterface $do)
     {
         return $this->convertDataObjectSet(new ArrayList(array($do)));
     }
 
+    /**
+     * @inheritdoc
+     */
     public function convertDataObjectSet(SS_List $set)
     {
         $this->setHeader();
@@ -35,12 +60,18 @@ class ExcelDataFormatter extends DataFormatter
         return $fileData;
     }
 
+    /**
+     * Set the HTTP Content Type header to the appropriate Mime Type.
+     */
     protected function setHeader()
     {
         Controller::curr()->getResponse()
             ->addHeader("Content-Type", $this->supportedMimeTypes()[0]);
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getFieldsForObj($do)
     {
         $fields = parent::getFieldsForObj($do);
@@ -51,19 +82,29 @@ class ExcelDataFormatter extends DataFormatter
         return $fields;
     }
 
-
-    public function getPhpExcelObject(SS_List $set) {
+    /**
+     * Generate a {@link PHPExcel} for the provided DataObject List
+     * @param  SS_List $set List of DataObjects
+     * @return PHPExcel
+     */
+    public function getPhpExcelObject(SS_List $set)
+    {
+        // Get the first object. We'll need it to know what type of objects we
+        // are dealing with
         $first = $set->first();
 
         // Get the Excel object
         $excel = $this->setupExcel($first);
         $sheet = $excel->setActiveSheetIndex(0);
 
+        // Make sure we have at lease on item. If we don't, we'll be returning
+        // an empty spreadsheet.
         if ($first) {
             // Set up the header row
             $fields = $this->getFieldsForObj($first);
             $this->headerRow($sheet, $fields);
 
+            // Add a new row for each DataObject
             foreach ($set as $item) {
                 $this->addRow($sheet, $item, $fields);
             }
@@ -86,6 +127,12 @@ class ExcelDataFormatter extends DataFormatter
         return $excel;
     }
 
+    /**
+     * Initialize a new {@link PHPExcel} object based on the provided
+     * {@link DataObjectInterface} interface.
+     * @param  DataObjectInterface $do
+     * @return PHPExcel
+     */
     protected function setupExcel(DataObjectInterface $do)
     {
         // Try to get the current user
@@ -114,19 +161,27 @@ class ExcelDataFormatter extends DataFormatter
                 array('pluralr' => $plural)
             ));
 
-        $excel->getActiveSheet()->setTitle(_t(
-            'firebrandhq.EXCELEXPORT',
-            'Export'
-        ));
+        // Give a name to the sheet
+        if ($plural) {
+            $excel->getActiveSheet()->setTitle($plural);
+        }
 
         return $excel;
     }
 
+    /**
+     * Add an header row to a {@link PHPExcel_Worksheet}.
+     * @param  PHPExcel_Worksheet $sheet
+     * @param  array              $fields List of fields
+     * @return PHPExcel_Worksheet
+     */
     protected function headerRow(PHPExcel_Worksheet &$sheet, array $fields)
     {
+        // Counter
         $row = 1;
         $col = 0;
 
+        // Add each field to the first row
         foreach ($fields as $field => $type) {
             $sheet->setCellValueByColumnAndRow($col, $row, $field);
             $col++;
@@ -144,8 +199,19 @@ class ExcelDataFormatter extends DataFormatter
         return $sheet;
     }
 
-    protected function addRow(PHPExcel_Worksheet &$sheet, DataObjectInterface $item, array $fields)
-    {
+    /**
+     * Add a new row to a {@link PHPExcel_Worksheet} based of a
+     * {@link DataObjectInterface}
+     * @param PHPExcel_Worksheet  $sheet
+     * @param DataObjectInterface $item
+     * @param array               $fields List of fields to include
+     * @return PHPExcel_Worksheet
+     */
+    protected function addRow(
+        PHPExcel_Worksheet &$sheet,
+        DataObjectInterface $item,
+        array $fields
+    ) {
         $row = $sheet->getHighestRow() + 1;
         $col = 0;
 
@@ -154,11 +220,20 @@ class ExcelDataFormatter extends DataFormatter
             $col++;
         }
 
-
         return $sheet;
     }
 
-    protected function getFileData(PHPExcel $excel, $format) {
+    /**
+     * Generate a string representation of an {@link PHPExcel} spread sheet
+     * suitable for output to the browser.
+     * @param  PHPExcel $excel
+     * @param  string   $format Format to use when outputting the spreadsheet.
+     * Must be compatible with the format expected by
+     * {@link PHPExcel_IOFactory::createWriter}.
+     * @return string
+     */
+    protected function getFileData(PHPExcel $excel, $format)
+    {
         $writer = PHPExcel_IOFactory::createWriter($excel, $format);
         ob_start();
         $writer->save('php://output');
