@@ -1,4 +1,17 @@
 <?php
+
+/**
+ * Enhanced GridField export button that allows the list to be exported to:
+ *  * Excel 2007,
+ *  * Excel 5,
+ *  * CSV
+ *
+ * The button appears has a Split button exposing the 3 possible export format.
+ *
+ * @author Firebrand <hello@firebrand.nz>
+ * @license MIT
+ * @package silverstripe-excel-export
+ */
 class GridFieldExcelExportButton implements
     GridField_HTMLProvider,
     GridField_ActionProvider,
@@ -10,20 +23,30 @@ class GridFieldExcelExportButton implements
      */
     protected $targetFragment;
 
+    /**
+     * Instanciate GridFieldExcelExportButton.
+     * @param string $targetFragment
+     */
     public function __construct($targetFragment = "before")
     {
         $this->targetFragment = $targetFragment;
     }
 
     /**
-     * Place the export button in a <p> tag below the field
+     * @inheritdoc
+     *
+     * Create the split button with all the export options.
+     *
+     * @param  GridField $gridField
+     * @return array
      */
     public function getHTMLFragments($gridField)
     {
+        // Set up the split button
         $splitButton = new SplitButton('Export', 'Export');
         $splitButton->setAttribute('data-icon', 'download-csv');
 
-
+        // XLSX option
         $button = new GridField_FormAction(
             $gridField,
             'xlsxexport',
@@ -34,6 +57,7 @@ class GridFieldExcelExportButton implements
         $button->addExtraClass('no-ajax');
         $splitButton->push($button);
 
+        // XLS option
         $button = new GridField_FormAction(
             $gridField,
             'xlsexport',
@@ -44,6 +68,7 @@ class GridFieldExcelExportButton implements
         $button->addExtraClass('no-ajax');
         $splitButton->push($button);
 
+        // CSV option
         $button = new GridField_FormAction(
             $gridField,
             'csvexport',
@@ -52,25 +77,26 @@ class GridFieldExcelExportButton implements
             null
         );
         $button->addExtraClass('no-ajax');
-
         $splitButton->push($button);
 
+        // Return the fragment
         return array(
             $this->targetFragment =>
-
                  $splitButton->Field()
-
         );
     }
 
     /**
-     * export is an action button
+     * @inheritdoc
      */
     public function getActions($gridField)
     {
         return array('xlsxexport', 'xlsexport', 'csvexport');
     }
 
+    /**
+     * @inheritdoc
+     */
     public function handleAction(
         GridField $gridField,
         $actionName,
@@ -91,7 +117,7 @@ class GridFieldExcelExportButton implements
     }
 
     /**
-     * it is also a URL
+     * @inheritdoc
      */
     public function getURLHandlers($gridField)
     {
@@ -103,8 +129,11 @@ class GridFieldExcelExportButton implements
     }
 
     /**
-     * Handle the export, for both the action button and the URL
-      */
+     * Action to export the GridField list to an Excel 2007 file.
+     * @param  GridField $gridField
+     * @param  SS_HTTPRequest    $request
+     * @return string
+     */
     public function handleXlsx(GridField $gridField, $request = null)
     {
         $items = $this->getItems($gridField);
@@ -115,17 +144,14 @@ class GridFieldExcelExportButton implements
         $fileData = $formater->convertDataObjectSet($items);
 
         return $fileData;
-
-        // return SS_HTTPRequest::send_file(
-        //     $fileData,
-        //     'file.xlsx',
-        //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        // );
     }
 
     /**
-     * Handle the export, for both the action button and the URL
-      */
+     * Action to export the GridField list to an Excel 5 file.
+     * @param  GridField $gridField
+     * @param  SS_HTTPRequest    $request
+     * @return string
+     */
     public function handleXls(GridField $gridField, $request = null)
     {
         $items = $this->getItems($gridField);
@@ -139,8 +165,11 @@ class GridFieldExcelExportButton implements
     }
 
     /**
-     * Handle the export, for both the action button and the URL
-      */
+     * Action to export the GridField list to an CSV file.
+     * @param  GridField $gridField
+     * @param  SS_HTTPRequest    $request
+     * @return string
+     */
     public function handleCsv(GridField $gridField, $request = null)
     {
         $items = $this->getItems($gridField);
@@ -153,6 +182,11 @@ class GridFieldExcelExportButton implements
         return $fileData;
     }
 
+    /**
+     * Set the HTTP header to force a download and set the filename.
+     * @param GridField $gridField
+     * @param string $ext Extension to use in the filename.
+     */
     protected function setHeader($gridField, $ext)
     {
         $do = singleton($gridField->getModelClass());
@@ -162,9 +196,15 @@ class GridFieldExcelExportButton implements
                 "Content-Disposition",
                 'attachment; filename="' .
                 $do->i18n_plural_name() .
-                '.' . $ext . '"');
+                '.' . $ext . '"'
+            );
     }
 
+    /**
+     * Helper function to extract the item list out of the GridField.
+     * @param  GridField $gridField
+     * @return SS_list
+     */
     protected function getItems(GridField $gridField)
     {
         $gridField->getConfig()->removeComponentsByType('GridFieldPaginator');
