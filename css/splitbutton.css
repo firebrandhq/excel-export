@@ -1,0 +1,28 @@
+.cms .splitbutton.ss-ui-action-tabset.action-menus.ss-tabset {
+	margin-top: 0;
+}
+
+.splitbutton.ui-button-text-only .ui-button-text {
+	padding: 0;
+}
+.splitbutton.ui-button-text-icon-primary .ui-button-text {
+	padding-top: 0;
+}
+
+.splitbutton.ui-tabs .ui-tabs-nav {
+	padding-right: 0;
+}
+
+.cms .splitbutton.ss-ui-action-tabset.action-menus.ss-tabset ul.ui-tabs-nav li a {
+	padding-right: 0;
+	color: rgb(57, 57, 57);
+	font-weight: bold;
+}
+
+.cms .splitbutton.ss-ui-action-tabset.action-menus.ss-tabset .ui-tabs-panel {
+	margin-top: 32px;
+
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
