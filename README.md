@@ -4,7 +4,7 @@ This Silverstripe module makes it easy to export a set of Silverstripe DataObjec
 * Excel 5 (XLS)
 * CSV
 
-This module is built by extending the standard [SilverStripe DataFormatter](http://api.silverstripe.org/3.1/class-DataFormatter.html)
+This module is built by extending the standard [SilverStripe DataFormatter](http://api.silverstripe.org/3.1/class-DataFormatter.html).
 
 ## Requirements
 
@@ -43,9 +43,9 @@ $filedata = $formatter->convertDataObject($user);
 $filedata = $formatter->convertDataObjectSet(Member::get());
 ```
 
-`convertDataObjectSet` and `convertDataObject` will automatically set the _Content-Type_ HTTP header to an appropriate Mime Type.
+`convertDataObjectSet()` and `convertDataObject()` will automatically set the _Content-Type_ HTTP header to an appropriate Mime Type.
 
-You can also retrieve the underlying PHPExcel object and export your DataObject set to whatever format supported by PHPExcel.
+You can also retrieve the underlying _PHPExcel_ object and export your DataObject set to whatever format supported by _PHPExcel_.
 
 ```
 // Get your Data
@@ -87,28 +87,28 @@ The above code snippet will display a split button allowing the user to export t
 Unlike the SilverStripe [GridFieldExportButton](http://api.silverstripe.org/3.1/class-GridFieldExportButton.html), the `GridFieldExcelExportButton` will export all the fields of the provided DataObjects ... not just the summary fields.
 
 ### Call via the SilverStripe RestfulServer Module
-The [SilverStripe RestfulServer Module](https://github.com/silverstripe/silverstripe-restfulserver) allows you to turn any SilverStripe into a RESTFul Server.
+The [SilverStripe RestfulServer Module](https://github.com/silverstripe/silverstripe-restfulserver) allows you to turn any SilverStripe website into a RESTFul Server.
 
-If you use the SilverStripe RestfulServer Module in conjunction with the Silverstripe Excel Export module, you'll be able to dynamically export any DataObject set just by entering the right URL in your browser.
+If you use the _SilverStripe RestfulServer Module_ in conjunction with the _Silverstripe Excel Export module_, you'll be able to dynamically export any DataObject set just by entering the right URL in your browser.
 
 #### Access control
-Obviously, you don't want everyone to be able to download any data off your website. The SilverStripe RestfulServer Module will only return results for DataObject with `$api_access` property.
+Obviously, you don't want everyone to be able to download any data off your website. The SilverStripe RestfulServer Module will only return results for DataObject with the `$api_access` property set.
 
 ```
 private static $api_access = true;
 ```
 
-Additionally, access to individual DataObjects can be controlled with the `canView` function.
+Additionally, access to individual DataObjects is controlled by the `canView` function.
 
 [Configuration the SilverStripe RestfulServer Module ](https://github.com/silverstripe/silverstripe-restfulserver#configuration)
 
 #### Getting to the data
-Exporting your data is just as easy as entering a URL:
-* Get a list of all Pages in Excel 2007: http://localhost/api/v1/Page.xlsx
-* Get a list of all Pages in Excel 5: http://localhost/api/v1/Page.xls
-* Get a list of all Pages in CSV: http://localhost/api/v1/Page.csv
-* Limit the list to 10 results: http://localhost/api/v1/Page.csv?limit=10
-* Return a single record: http://localhost/api/v1/Page/37.xlsx
-* Drill down into relationships: http://localhost/api/v1/Tag/127/Articles.xlsx
+Exporting your data is just as easy as entering a URL.
+* Get a list of all Pages in Excel 2007: *http://localhost/api/v1/Page.xlsx*
+* Get a list of all Pages in Excel 5: *http://localhost/api/v1/Page.xls*
+* Get a list of all Pages in CSV: *http://localhost/api/v1/Page.csv*
+* Limit the list to 10 results: *http://localhost/api/v1/Page.csv?limit=10*
+* Return a single record: *http://localhost/api/v1/Page/37.xlsx*
+* Drill down into relationships: *http://localhost/api/v1/Tag/127/Articles.xlsx*
 
 [SilverStripe RestfulServer Module Supported operations](https://github.com/silverstripe/silverstripe-restfulserver#supported-operations)
