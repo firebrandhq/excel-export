@@ -86,6 +86,10 @@ The above code snippet will display a split button allowing the user to export t
 
 Unlike the SilverStripe [GridFieldExportButton](http://api.silverstripe.org/3.1/class-GridFieldExportButton.html), the `GridFieldExcelExportButton` will export all the fields of the provided DataObjects ... not just the summary fields.
 
+You can also use the `GridFieldExcelExportAction` component. This button is added to each row and allows you to export individual records one at a time. Out of the box, `GridFieldExcelExportAction` will export to _xlsx_, but you can get it to export to _xls_ or _csv_ (e.g.: `new GridFieldExcelExportAction('csv')`).
+
+`GridFieldExcelExportAction` and `GridFieldExcelExportButton` can be used in conjunction if you want to give both options to your users.
+
 ### Call via the SilverStripe RestfulServer Module
 The [SilverStripe RestfulServer Module](https://github.com/silverstripe/silverstripe-restfulserver) allows you to turn any SilverStripe website into a RESTFul Server.
 
