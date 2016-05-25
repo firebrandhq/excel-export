@@ -106,8 +106,8 @@ class ExcelDataFormatter extends DataFormatter
             }
         }
 
-        // add default required fields
-        $dbFields = array_merge($dbFields, array('ID'=>'Int'));
+        // Make sure our ID field is the first one.
+        $dbFields = array('ID' => 'Int') + $dbFields;
 
         if(is_array($this->removeFields)) {
             $dbFields = array_diff_key($dbFields, array_combine($this->removeFields,$this->removeFields));
