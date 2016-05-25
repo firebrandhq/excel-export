@@ -323,7 +323,7 @@ class ExcelDataFormatter extends DataFormatter
      */
     public function setUseLabelsAsHeaders($value)
     {
-        if ($value == null) {
+        if ($value === null) {
             $this->useLabelsAsHeaders = null;
         } else {
             $this->useLabelsAsHeaders = (bool)$value;
