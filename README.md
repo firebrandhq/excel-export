@@ -116,3 +116,65 @@ Exporting your data is just as easy as entering a URL.
 * Drill down into relationships: *http://localhost/api/v1/Tag/127/Articles.xlsx*
 
 [SilverStripe RestfulServer Module Supported operations](https://github.com/silverstripe/silverstripe-restfulserver#supported-operations)
+
+## Customising the output
+
+There's 2 ways you can control the output:
+* Choose which fields to output ;
+* Choose to use field label instead of fields names in the headers.
+
+### Choose which fields to output
+Because the `ExcelDataFormatter` extends [DataFormatter](http://api.silverstripe.org/3.3/class-DataFormatter.html), you can use methods like `setCustomFields()`, `setCustomAddFields()` or `setRemoveFields()` to control what fields will be present in the spread sheet.
+
+```
+$formatter = new ExcelDataFormatter();
+
+// This formatter instead of returning every field of a DataObject, will only return 3 fields.
+$formatter->setCustomFields(['ID', 'Title', 'LastEdited']);
+
+// If youe DataObject has dynamic properties, you can reference them using setCustomAddFields().
+$formatter->setCustomAddFields(['ChildrenCount']);
+```
+
+#### Defining a default column set
+You can customise the default column set that will be return for a specific DataObject class by defining a `getExcelExportFields()` method on your DataOject class.
+
+This `getExcelExportFields()` method should return an array of fields following the same format used by `DataObject::inheritedDatabaseFields()`:
+```
+return [
+    'ID' => 'Int',
+    'Name' => 'Varchar',
+    'Address' => 'Text'
+];
+```
+
+You may also reference relationships in this array or dynamic properties:
+```
+return [
+    'Owner.Name' => 'Varchar',
+    'Category.Title' => 'Varchar',
+    'ChildrenCount' => 'Int',
+];
+```
+
+This will also allow you to control the order the fields appear in the Spread Sheet. Note that ID will always be the first field and cannot be removed.
+
+This behavior can be overriden for specific instances of `ExcelDataFormatter` by calling the `setCustomFields()` method.
+
+## Use field labels or field names as column headers
+Out of the box, the actual field names will be used as column header. (e.g.: `FirstName` rather than `First Name`).
+
+You can customise this behavior and use the Field Labels as define on your DataObject class instead. When generating the header row, `ExcelDataFormatter` will call the `fieldLabel()` method on your Data Object to decide what string to use in each header.
+
+### Change the default for all `ExcelDataFormatter`
+In you YML config, you can use the following syntax to change the default headers.
+```
+ExcelDataFormatter:
+  UseLabelsAsHeaders: true
+```
+
+### Override the default for a specific instance
+You may change the default behavior for a specific instance.
+```
+$formatter->setUseLabelsAsHeaders(true);
+```
