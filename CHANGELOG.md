@@ -1,4 +1,4 @@
-# Tag 1.1.0
+# Tag 0.2.0
 
 ## Wednesday, May 25, 2016
 * Updated ExcelDataFormatter::addRow() and ExcelDataFormatter::getFieldsForObj() so that DataObjects can suggest a default set of Fields to Export.
