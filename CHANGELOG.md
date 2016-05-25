@@ -5,3 +5,4 @@
 * Added the ability for the ExcelDataFormatter to use field labels instead of just displaying the Database Field name.
 * Added a change log.
 * Updated the ReadMe with information about how to choose the column and customise the headers.
+* Generalise the logic on the GridFieldExcelExportButton to minimise code duplication between the XLSX, XLS and CSV action.

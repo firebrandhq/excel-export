@@ -136,14 +136,7 @@ class GridFieldExcelExportButton implements
      */
     public function handleXlsx(GridField $gridField, $request = null)
     {
-        $items = $this->getItems($gridField);
-
-        $this->setHeader($gridField, 'xlsx');
-
-        $formater = new ExcelDataFormatter();
-        $fileData = $formater->convertDataObjectSet($items);
-
-        return $fileData;
+        return $this->genericHandle('ExcelDataFormatter', 'xlsx', $gridField, $request);
     }
 
     /**
@@ -154,14 +147,7 @@ class GridFieldExcelExportButton implements
      */
     public function handleXls(GridField $gridField, $request = null)
     {
-        $items = $this->getItems($gridField);
-
-        $this->setHeader($gridField, 'xls');
-
-        $formater = new OldExcelDataFormatter();
-        $fileData = $formater->convertDataObjectSet($items);
-
-        return $fileData;
+        return $this->genericHandle('OldExcelDataFormatter', 'xls', $gridField, $request);
     }
 
     /**
@@ -172,11 +158,24 @@ class GridFieldExcelExportButton implements
      */
     public function handleCsv(GridField $gridField, $request = null)
     {
+        return $this->genericHandle('CsvDataFormatter', 'csv', $gridField, $request);
+    }
+
+    /**
+     * Generic Handle request that will return a Spread Sheet in the requested format
+     * @param  string    $dataFormatterClass
+     * @param  string    $ext
+     * @param  GridField $gridField
+     * @param  SS_HTTPRequest    $request
+     * @return string
+     */
+    protected function genericHandle($dataFormatterClass, $ext, GridField $gridField, $request = null)
+    {
         $items = $this->getItems($gridField);
 
-        $this->setHeader($gridField, 'csv');
+        $this->setHeader($gridField, $ext);
 
-        $formater = new CsvDataFormatter();
+        $formater = new $dataFormatterClass();
         $fileData = $formater->convertDataObjectSet($items);
 
         return $fileData;
