@@ -19,6 +19,12 @@ class ExcelDataFormatter extends DataFormatter
     private static $api_base = "api/v1/";
 
     /**
+     * Determined what we will use as headers for the spread sheet.
+     * @var bool
+     */
+    protected $useLabelsAsHeaders = null;
+
+    /**
      * @inheritdoc
      */
     public function supportedExtensions()
@@ -130,7 +136,7 @@ class ExcelDataFormatter extends DataFormatter
         if ($first) {
             // Set up the header row
             $fields = $this->getFieldsForObj($first);
-            $this->headerRow($sheet, $fields);
+            $this->headerRow($sheet, $fields, $first);
 
             // Add a new row for each DataObject
             foreach ($set as $item) {
@@ -201,17 +207,21 @@ class ExcelDataFormatter extends DataFormatter
      * Add an header row to a {@link PHPExcel_Worksheet}.
      * @param  PHPExcel_Worksheet $sheet
      * @param  array              $fields List of fields
+     * @param  DataObjectInterface  $do
      * @return PHPExcel_Worksheet
      */
-    protected function headerRow(PHPExcel_Worksheet &$sheet, array $fields)
+    protected function headerRow(PHPExcel_Worksheet &$sheet, array $fields, DataObjectInterface $do)
     {
         // Counter
         $row = 1;
         $col = 0;
 
+        $useLabelsAsHeaders = $this->getUseLabelsAsHeaders();
+
         // Add each field to the first row
         foreach ($fields as $field => $type) {
-            $sheet->setCellValueByColumnAndRow($col, $row, $field);
+            $header = $useLabelsAsHeaders ? $do->fieldLabel($field) : $field;
+            $sheet->setCellValueByColumnAndRow($col, $row, $header);
             $col++;
         }
 
@@ -274,5 +284,50 @@ class ExcelDataFormatter extends DataFormatter
         $fileData = ob_get_clean();
 
         return $fileData;
+    }
+
+    /**
+     * Accessor for UseLabelsAsHeaders. If this is `true`, the data formatter will call {@link DataObject::fieldLabel()} to pick the header strings. If it's set to false, it will use the raw field name.
+     *
+     * You can define this for a specific ExcelDataFormatter instance with `setUseLabelsAsHeaders`. You can set the default for all ExcelDataFormatter instance in your YML config file:
+     *
+     * ```
+     * ExcelDataFormatter:
+     *   UseLabelsAsHeaders: true
+     * ```
+     *
+     * Otherwise, the data formatter will default to false.
+     *
+     * @return bool
+     */
+    public function getUseLabelsAsHeaders()
+    {
+        if ($this->useLabelsAsHeaders !== null) {
+            return $this->useLabelsAsHeaders;
+        }
+
+        $useLabelsAsHeaders = static::config()->UseLabelsAsHeaders;
+        if ($useLabelsAsHeaders !== null) {
+            return $useLabelsAsHeaders;
+        }
+
+        return false;
+    }
+
+    /**
+     * Setter for UseLabelsAsHeaders. If this is `true`, the data formatter will call {@link DataObject::fieldLabel()} to pick the header strings. If it's set to false, it will use the raw field name.
+     *
+     * If `$value` is `null`, the data formatter will fall back on whatevr the default is.
+     * @param bool $value
+     * @return ExcelDataFormatter
+     */
+    public function setUseLabelsAsHeaders($value)
+    {
+        if ($value == null) {
+            $this->useLabelsAsHeaders = null;
+        } else {
+            $this->useLabelsAsHeaders = (bool)$value;
+        }
+        return $this;
     }
 }
