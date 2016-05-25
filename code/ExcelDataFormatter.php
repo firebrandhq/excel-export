@@ -72,14 +72,42 @@ class ExcelDataFormatter extends DataFormatter
     /**
      * @inheritdoc
      */
-    protected function getFieldsForObj($do)
+    protected function getFieldsForObj($obj)
     {
-        $fields = parent::getFieldsForObj($do);
+        $dbFields = array();
 
-        // Make sure our ID field is the first one.
-        $fields = array('ID' => $fields['ID']) + $fields;
+        // if custom fields are specified, only select these
+        if(is_array($this->customFields)) {
+            foreach($this->customFields as $fieldName) {
+                // @todo Possible security risk by making methods accessible - implement field-level security
+                if($obj->hasField($fieldName) || $obj->hasMethod("get{$fieldName}")) {
+                    $dbFields[$fieldName] = $fieldName;
+                }
+            }
+        } elseif ($obj->hasMethod('getExcelExportFields')) {
+            $dbFields = $obj->getExcelExportFields();
+        } else {
+            // by default, all database fields are selected
+            $dbFields = $obj->inheritedDatabaseFields();
+        }
 
-        return $fields;
+        if(is_array($this->customAddFields)) {
+            foreach($this->customAddFields as $fieldName) {
+                // @todo Possible security risk by making methods accessible - implement field-level security
+                if($obj->hasField($fieldName) || $obj->hasMethod("get{$fieldName}")) {
+                    $dbFields[$fieldName] = $fieldName;
+                }
+            }
+        }
+
+        // add default required fields
+        $dbFields = array_merge($dbFields, array('ID'=>'Int'));
+
+        if(is_array($this->removeFields)) {
+            $dbFields = array_diff_key($dbFields, array_combine($this->removeFields,$this->removeFields));
+        }
+
+        return $dbFields;
     }
 
     /**
@@ -216,7 +244,13 @@ class ExcelDataFormatter extends DataFormatter
         $col = 0;
 
         foreach ($fields as $field => $type) {
-            $sheet->setCellValueByColumnAndRow($col, $row, $item->$field);
+            if ($item->hasField($field) || $item->hasMethod("get{$field}")) {
+                $value = $item->$field;
+            } else {
+                $viewer = SSViewer::fromString('$' . $field . '.RAW');
+                $value = $item->renderWith($viewer, true);
+            }
+            $sheet->setCellValueByColumnAndRow($col, $row, $value);
             $col++;
         }
 
