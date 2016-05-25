@@ -13,6 +13,12 @@ class GridFieldExcelExportAction implements GridField_ColumnProvider, GridField_
      */
     protected $exportType;
 
+    /**
+     * Whatever to override the default $useFieldLabelsAsHeaders value for the DataFormatter.
+     * @var bool
+     */
+    protected $useLabelsAsHeaders = null;
+
 
     /**
      * Instanciate a new GridFieldExcelExportAction
@@ -127,7 +133,7 @@ class GridFieldExcelExportAction implements GridField_ColumnProvider, GridField_
             if ($title) {
                 $filename .= ' - ' . $title;
             }
-            
+
             // Pick Converter
             switch ($this->exportType) {
                 case 'xlsx':
@@ -151,6 +157,7 @@ class GridFieldExcelExportAction implements GridField_ColumnProvider, GridField_
             $this->setHeader($gridField, $this->exportType, $filename);
 
             // Export our Data Object
+            $formater->setUseLabelsAsHeaders($this->useLabelsAsHeaders);
             $fileData = $formater->convertDataObject($item);
 
             return $fileData;
@@ -177,5 +184,32 @@ class GridFieldExcelExportAction implements GridField_ColumnProvider, GridField_
                 $filename .
                 '.' . $ext . '"'
             );
+    }
+
+    /**
+     * Set the DataFormatter's UseFieldLabelsAsHeaders property
+     * @param bool $value
+     * @return GridFieldExcelExportButton
+     */
+    public function setUseLabelsAsHeaders($value)
+    {
+        if ($value === null) {
+            $this->useLabelsAsHeaders = null;
+        } else {
+            $this->useLabelsAsHeaders = (bool)$value;
+        }
+        return $this;
+    }
+
+    /**
+     * Return the value that will be assigned to the DataFormatter's UseFieldLabelsAsHeaders property
+     *
+     * If null, will fallback on the default.
+     *
+     * @return bool|null
+     */
+    public function getUseLabelsAsHeaders()
+    {
+        return $this->useLabelsAsHeaders;
     }
 }

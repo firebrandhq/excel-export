@@ -19,6 +19,12 @@ class GridFieldExcelExportButton implements
 {
 
     /**
+     * Whatever to override the default $useFieldLabelsAsHeaders value for the DataFormatter.
+     * @var bool
+     */
+    protected $useLabelsAsHeaders = null;
+
+    /**
      * Fragment to write the button to
      */
     protected $targetFragment;
@@ -175,7 +181,10 @@ class GridFieldExcelExportButton implements
 
         $this->setHeader($gridField, $ext);
 
+
         $formater = new $dataFormatterClass();
+        $formater->setUseLabelsAsHeaders($this->useLabelsAsHeaders);
+
         $fileData = $formater->convertDataObjectSet($items);
 
         return $fileData;
@@ -225,5 +234,32 @@ class GridFieldExcelExportButton implements
         }
 
         return $arrayList;
+    }
+
+    /**
+     * Set the DataFormatter's UseFieldLabelsAsHeaders property
+     * @param bool $value
+     * @return GridFieldExcelExportButton
+     */
+    public function setUseLabelsAsHeaders($value)
+    {
+        if ($value === null) {
+            $this->useLabelsAsHeaders = null;
+        } else {
+            $this->useLabelsAsHeaders = (bool)$value;
+        }
+        return $this;
+    }
+
+    /**
+     * Return the value that will be assigned to the DataFormatter's UseFieldLabelsAsHeaders property
+     *
+     * If null, will fallback on the default.
+     *
+     * @return bool|null
+     */
+    public function getUseLabelsAsHeaders()
+    {
+        return $this->useLabelsAsHeaders;
     }
 }

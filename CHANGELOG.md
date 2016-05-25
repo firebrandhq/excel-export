@@ -6,3 +6,4 @@
 * Added a change log.
 * Updated the ReadMe with information about how to choose the column and customise the headers.
 * Generalise the logic on the GridFieldExcelExportButton to minimise code duplication between the XLSX, XLS and CSV action.
+* Update GridFieldExcelExportAction and GridFieldExcelExportButton so we can set the UseLabelsAsHeaders flag on the underlying ExcelDataFormatter.
