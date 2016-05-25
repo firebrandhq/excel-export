@@ -19,6 +19,12 @@ class GridFieldExcelExportButton implements
 {
 
     /**
+     * Whatever to override the default $useFieldLabelsAsHeaders value for the DataFormatter.
+     * @var bool
+     */
+    protected $useLabelsAsHeaders = null;
+
+    /**
      * Fragment to write the button to
      */
     protected $targetFragment;
@@ -136,14 +142,7 @@ class GridFieldExcelExportButton implements
      */
     public function handleXlsx(GridField $gridField, $request = null)
     {
-        $items = $this->getItems($gridField);
-
-        $this->setHeader($gridField, 'xlsx');
-
-        $formater = new ExcelDataFormatter();
-        $fileData = $formater->convertDataObjectSet($items);
-
-        return $fileData;
+        return $this->genericHandle('ExcelDataFormatter', 'xlsx', $gridField, $request);
     }
 
     /**
@@ -154,14 +153,7 @@ class GridFieldExcelExportButton implements
      */
     public function handleXls(GridField $gridField, $request = null)
     {
-        $items = $this->getItems($gridField);
-
-        $this->setHeader($gridField, 'xls');
-
-        $formater = new OldExcelDataFormatter();
-        $fileData = $formater->convertDataObjectSet($items);
-
-        return $fileData;
+        return $this->genericHandle('OldExcelDataFormatter', 'xls', $gridField, $request);
     }
 
     /**
@@ -172,11 +164,27 @@ class GridFieldExcelExportButton implements
      */
     public function handleCsv(GridField $gridField, $request = null)
     {
+        return $this->genericHandle('CsvDataFormatter', 'csv', $gridField, $request);
+    }
+
+    /**
+     * Generic Handle request that will return a Spread Sheet in the requested format
+     * @param  string    $dataFormatterClass
+     * @param  string    $ext
+     * @param  GridField $gridField
+     * @param  SS_HTTPRequest    $request
+     * @return string
+     */
+    protected function genericHandle($dataFormatterClass, $ext, GridField $gridField, $request = null)
+    {
         $items = $this->getItems($gridField);
 
-        $this->setHeader($gridField, 'csv');
+        $this->setHeader($gridField, $ext);
 
-        $formater = new CsvDataFormatter();
+
+        $formater = new $dataFormatterClass();
+        $formater->setUseLabelsAsHeaders($this->useLabelsAsHeaders);
+
         $fileData = $formater->convertDataObjectSet($items);
 
         return $fileData;
@@ -226,5 +234,32 @@ class GridFieldExcelExportButton implements
         }
 
         return $arrayList;
+    }
+
+    /**
+     * Set the DataFormatter's UseFieldLabelsAsHeaders property
+     * @param bool $value
+     * @return GridFieldExcelExportButton
+     */
+    public function setUseLabelsAsHeaders($value)
+    {
+        if ($value === null) {
+            $this->useLabelsAsHeaders = null;
+        } else {
+            $this->useLabelsAsHeaders = (bool)$value;
+        }
+        return $this;
+    }
+
+    /**
+     * Return the value that will be assigned to the DataFormatter's UseFieldLabelsAsHeaders property
+     *
+     * If null, will fallback on the default.
+     *
+     * @return bool|null
+     */
+    public function getUseLabelsAsHeaders()
+    {
+        return $this->useLabelsAsHeaders;
     }
 }
