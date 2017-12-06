@@ -167,36 +167,44 @@ class ExcelDataFormatter extends DataFormatter
      * @param  DataObjectInterface $do
      * @return PHPExcel
      */
-    protected function setupExcel(DataObjectInterface $do)
+    protected function setupExcel($do)
     {
         // Try to get the current user
         $member = Member::currentUser();
         $creator = $member ? $member->getName() : '';
 
         // Get information about the current Model Class
-        $singular = $do ? $do->i18n_singular_name() : '';
-        $plural = $do ? $do->i18n_plural_name() : '';
+        $singular = '';
+        $plural = '';
+        if ($do && $do instanceof DataObjectInterface) {
+            $singular = $do->i18n_singular_name();
+            $plural = $do->i18n_plural_name();
+        }
 
         // Create the Spread sheet
         $excel = new PHPExcel();
 
         $excel->getProperties()
-            ->setCreator($creator)
-            ->setTitle(_t(
+            ->setCreator($creator);
+
+        if ($singular) {
+            $excel->setTitle(_t(
                 'firebrandhq.EXCELEXPORT',
                 '{singular} export',
                 'Title for the spread sheet export',
                 array('singular' => $singular)
-            ))
-            ->setDescription(_t(
+            ));
+        }
+
+        // Give a name to the sheet
+        if ($plural) {
+            $excel->setDescription(_t(
                 'firebrandhq.EXCELEXPORT',
                 'List of {plural} exported out of a SilverStripe website',
                 'Description for the spread sheet export',
                 array('pluralr' => $plural)
             ));
 
-        // Give a name to the sheet
-        if ($plural) {
             $excel->getActiveSheet()->setTitle($plural);
         }
 
