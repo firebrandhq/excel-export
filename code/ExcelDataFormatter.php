@@ -192,7 +192,7 @@ class ExcelDataFormatter extends DataFormatter
                 'firebrandhq.EXCELEXPORT',
                 'List of {plural} exported out of a SilverStripe website',
                 'Description for the spread sheet export',
-                array('pluralr' => $plural)
+                array('plural' => $plural)
             ));
 
         // Give a name to the sheet
